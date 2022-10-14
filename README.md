@@ -22,6 +22,10 @@ zfs allow <user> create,receive,mount,destroy,rollback yourpool/<user>_backup
 
 Download the `restrict_zfs.py` script from this repository and place it in the user's home directory.
 
+```
+wget https://raw.githubusercontent.com/Derkades/ssh-zfs-receive/main/restrict_zfs.py
+```
+
 Now, allow SSH access by placing the other party's public key in `.ssh/authorized_keys`. However, configure SSH to always run this Python script instead of the user's command:
 
 ```
