@@ -23,6 +23,8 @@ ALLOWED_COMMANDS = [
     r' lzop -dfc \|  zfs receive  -s -F ' + DATASET,
     r' lzop -dfc \|  zfs receive  -s -F ' + DATASET + r' 2>&1',
     r' zfs rollback -R ' + DATASET_SNAPSHOT,
+    r' mbuffer (-r \d+[kM])? -q -s \d+[kM] -m \d+[kM] 2>\/dev\/null \| lzop -dfc \|  zfs receive  -s -F ' + DATASET,
+    r' mbuffer (-r \d+[kM])? -q -s \d+[kM] -m \d+[kM] 2>\/dev\/null \| lzop -dfc \|  zfs receive  -s -F ' + DATASET + ' 2>&1',
 ]
 
 COMPILED = [re.compile(command) for command in ALLOWED_COMMANDS]
