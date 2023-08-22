@@ -3,10 +3,10 @@ import re
 import syslog
 import sys
 
+POOL = r"'[A-Za-z0-9_-]+'"
+DATASET = r"'[A-Za-z0-9_\/-]+'"
+DATASET_SNAPSHOT = r"'[A-Za-z0-9_\/-]+'@'[A-Za-z0-9:_-]+'"
 
-POOL = r"'[a-z0-9_-]+'"
-DATASET = r"'([a-z0-9_-]+\/?)+'"
-DATASET_SNAPSHOT = r"'([a-z0-9_-]+\/?)+'@'[a-z0-9:_-]+'"
 
 # These commands were issued by Syncoid with standard options. If in your
 # usage you notice any commands that should be allowed but aren't allowed
