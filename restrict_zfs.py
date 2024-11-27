@@ -4,13 +4,13 @@ import syslog
 import sys
 import subprocess
 
-POOL = r"'[A-Za-z0-9_-]+'"
-DATASET = r"'[A-Za-z0-9_\/-]+'"
-DATASET_SNAPSHOT = r"'[A-Za-z0-9_\/-]+'@'[A-Za-z0-9:_-]+'"
+POOL = r"'[\w-]+'"
+DATASET = r"'[\w\/-]+'"
+DATASET_SNAPSHOT = r"'[\w/-]+'@'[\w:-]+'"
 
 # Used when syncoid calls zfs destroy -- ONLY snapshots that match this regex will be allowed to be destroyed.
 # Note: Syncoid does NOT single quote the snapshot name as of version 2.1.0, but let's allow that.
-SYNCOID_SNAPSHOT = r"'[A-Za-z0-9_\/-]+'@('?)syncoid_[A-Za-z0-9:_-]+\1"
+SYNCOID_SNAPSHOT = r"'[\w/-]+'@('?)syncoid_[\w:-]+\1"
 
 # These commands were issued by Syncoid with standard options. If in your
 # usage you notice any commands that should be allowed but aren't allowed
