@@ -17,7 +17,7 @@ SYNCOID_SNAPSHOT = r"'[\w/-]+'@('?)syncoid_[\w:-]+\1"
 ALLOWED_COMMANDS = [
     r'exit',
     r'echo -n',
-    r'command -v (lzop|mbuffer)',
+    r'command -v (?:gzip|zcat|pigz|zstd|xz|lzop|lz4|mbuffer|socat|busybox)',
     r'zpool get -o value -H feature@extensible_dataset ' + POOL,
     r'ps -Ao args=',
     r'zfs get -H (name|receive_resume_token) ' + DATASET,
