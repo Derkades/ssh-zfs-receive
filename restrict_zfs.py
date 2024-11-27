@@ -46,6 +46,9 @@ def check_allowed(command: str):
 
 
 if __name__ == '__main__':
+    dryrun = False
+    tostderr = False
+    tosyslog = True
     original_command = os.environ['SSH_ORIGINAL_COMMAND']
 
     # Syncoid can send multiple destroy commands separated by a semicolon when pruning.
@@ -54,11 +57,22 @@ if __name__ == '__main__':
 
     for command in commands:
         command = command.strip()
+        command2 = ['sh', '-c', command]
+
         is_allowed = check_allowed(command)
         if not is_allowed:
-            syslog.syslog('blocked command: ' + command)
-            sys.exit(1)
+            errtext = 'blocked command: ' + command
+        elif dryrun:
+            errtext = 'would run command (dry run): ' + str(command2)
+        else:
+            errtext = 'running command: ' + str(command2)
 
-        command2 = ['sh', '-c', command]
-        syslog.syslog('running command: ' + str(command2))
-        subprocess.run(command2)
+        if tostderr:
+            print(errtext, file=sys.stderr)
+        if tosyslog:
+            syslog.syslog(errtext)
+
+        if not is_allowed:
+            sys.exit(1)
+        elif not dryrun:
+            subprocess.run(command2)
