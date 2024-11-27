@@ -12,6 +12,20 @@ DATASET_SNAPSHOT = r"'[\w/-]+'@'[\w:-]+'"
 # Note: Syncoid does NOT single quote the snapshot name as of version 2.1.0, but let's allow that.
 SYNCOID_SNAPSHOT = r"'[\w/-]+'@('?)syncoid_[\w:-]+\1"
 
+SYNCOID_HOLD = r"[\w]+"
+
+REDIRS = r'(?:\s+(?:2>/dev/null|2>&1))?'
+PIPE = r'\s*\|\s*'
+MBUFFER_CMD = r'mbuffer (?:-[rR] \d+[kM])? (?:-W \d+ -I [\w.:-]+ )?-q -s \d+[kM] -m \d+[kM]'
+NC_CMD = r'busybox nc -l [\w.:-]+ -w \d+'
+MBUFFER_OR_NC_CMD = r'(?:' + MBUFFER_CMD + r'|' + NC_CMD + r')'
+SOCAT_CMD = r'socat - TCP:[\w.:-]+,retry=\d+,interval=1'
+COMPRESS_CMD = r'(?:(?:gzip -3|zcat|pigz -(?:\d+|dc)|zstd -(?:\d+|dc)|xz(?: -d)?|lzop(?: -dfc)?|lz4(?: -dc)?)\s*\|)?'
+
+ZFSPROP = r'[a-z0-9:._-]+=[a-z0-9:._-]*'
+ZFSPROPS = r'(?:-o ' + ZFSPROP + r'\s+)*'
+SHORTOPTS = r'(?:-[A-Za-z0-9]+\s+)*'
+
 # These commands were issued by Syncoid with standard options. If in your
 # usage you notice any commands that should be allowed but aren't allowed
 # here, please contribute!
@@ -21,19 +35,22 @@ ALLOWED_COMMANDS = [
     r'command -v (?:gzip|zcat|pigz|zstd|xz|lzop|lz4|mbuffer|socat|busybox)',
     r'zpool get -o value -H feature@extensible_dataset ' + POOL,
     r'ps -Ao args=',
-    r'zfs get -H (name|receive_resume_token) ' + DATASET,
-    r'zfs get -Hpd 1 -t snapshot guid,creation ' + DATASET,
-    r'zfs get -H -p used ' + DATASET,
-    r'lzop -dfc \|  zfs receive  -s -F ' + DATASET,
-    r'lzop -dfc \|  zfs receive  -s -F ' + DATASET + r' 2>&1',
+    r'zfs get -H (?:name|receive_resume_token|-p used|syncoid:sync) ' + DATASET + REDIRS,
+    r'zfs get -Hpd 1 (?:-t (?:snapshot|bookmark) |type,)guid,creation ' + DATASET + REDIRS,
+    r'zfs get all -s local -H ' + DATASET,
+    r'zfs list -o name,origin -t filesystem,volume -Hr ' + DATASET,
     # If syncoid --no-sync-snap is *not* used, the following line may work with SYNCOID_SNAPSHOT
     # instead of DATASET_SNAPSHOT to be more restrictive
     r'zfs rollback -R ' + DATASET_SNAPSHOT,
-    r'mbuffer (-r \d+[kM])? -q -s \d+[kM] -m \d+[kM] 2>\/dev\/null \| lzop -dfc \|  zfs receive  -s (-F)? ' + DATASET,
-    r'mbuffer (-r \d+[kM])? -q -s \d+[kM] -m \d+[kM] 2>\/dev\/null \| lzop -dfc \|  zfs receive  -s (-F)? ' + DATASET + ' 2>&1',
+    MBUFFER_OR_NC_CMD + PIPE + COMPRESS_CMD + r'\s*zfs receive\s+' + SHORTOPTS + ZFSPROPS + DATASET + REDIRS,
+    r'zfs receive -A '+ DATASET,
+    r'zfs send\s+' + SHORTOPTS + r'(?:-t [0-9a-f-]+|-[iI] ' + DATASET_SNAPSHOT + r'(?: ' + DATASET_SNAPSHOT + r')?)' + REDIRS + r'(?:' + PIPE + MBUFFER_CMD + r'(?:' + PIPE + SOCAT_CMD + r')?)?',
+    r'zfs snapshot ' + SYNCOID_SNAPSHOT,
     # the script used to only allow destroying SYNCOID_SNAPSHOT but using --no-sync-snap it wanted to destroy "autosnap" snaps
     # loosening the restriction should be safe IF zfs delegation is used with a non-root user (SHOULD be mandatory for security)
     r'zfs destroy ' + DATASET_SNAPSHOT,
+    r'zfs hold ' + SYNCOID_HOLD + r'\s+' + DATASET_SNAPSHOT,
+    r'zfs release ' + SYNCOID_HOLD + r'\s+' + DATASET_SNAPSHOT,
 ]
 
 COMPILED = [re.compile(command) for command in ALLOWED_COMMANDS]
