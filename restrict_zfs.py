@@ -8,7 +8,6 @@ POOL = r"'[\w-]+'"
 DATASET = r"'[\w\/-]+'"
 DATASET_SNAPSHOT = r"'[\w/-]+'@'[\w:-]+'"
 
-# Used when syncoid calls zfs destroy -- ONLY snapshots that match this regex will be allowed to be destroyed.
 # Note: Syncoid does NOT single quote the snapshot name as of version 2.1.0, but let's allow that.
 SYNCOID_SNAPSHOT = r"'[\w/-]+'@('?)syncoid_[\w:-]+\1"
 
@@ -31,7 +30,9 @@ ALLOWED_COMMANDS = [
     r'zfs rollback -R ' + DATASET_SNAPSHOT,
     r'mbuffer (-r \d+[kM])? -q -s \d+[kM] -m \d+[kM] 2>\/dev\/null \| lzop -dfc \|  zfs receive  -s (-F)? ' + DATASET,
     r'mbuffer (-r \d+[kM])? -q -s \d+[kM] -m \d+[kM] 2>\/dev\/null \| lzop -dfc \|  zfs receive  -s (-F)? ' + DATASET + ' 2>&1',
-    r'zfs destroy ' + SYNCOID_SNAPSHOT,
+    # the script used to only allow destroying SYNCOID_SNAPSHOT but using --no-sync-snap it wanted to destroy "autosnap" snaps
+    # loosening the restriction should be safe IF zfs delegation is used with a non-root user (SHOULD be mandatory for security)
+    r'zfs destroy ' + DATASET_SNAPSHOT,
 ]
 
 COMPILED = [re.compile(command) for command in ALLOWED_COMMANDS]
