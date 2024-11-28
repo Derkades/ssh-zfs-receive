@@ -15,7 +15,7 @@ Create a parent dataset for receiving backups, for example: `zfs create yourpool
 The newly created user can now be given permission to create and modify datasets within this parent dataset.
 
 ```
-zfs allow <user> create,receive,mount,destroy,rollback yourpool/<user>_backup
+zfs allow <user> create,receive,mount,destroy,rollback,hold,release yourpool/<user>_backup
 ```
 
 ## Command restriction
