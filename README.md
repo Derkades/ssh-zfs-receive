@@ -15,21 +15,33 @@ Create a parent dataset for receiving backups, for example: `zfs create yourpool
 The newly created user can now be given permission to create and modify datasets within this parent dataset.
 
 ```
-zfs allow <user> create,receive,mount,destroy,rollback yourpool/<user>_backup
+zfs allow <user> create,receive,mount,destroy,rollback,hold,release yourpool/<user>_backup
 ```
 
 ## Command restriction
 
-Download the `restrict_zfs.py` script from this repository and place it in the user's home directory.
+Download the `restrict_zfs.py` script from this repository and place it in the user's PATH, or alternately in `/usr/local/bin` for it to be available to all users.
 
 ```
 wget https://raw.githubusercontent.com/Derkades/ssh-zfs-receive/main/restrict_zfs.py
+mkdir -p ~user/.local/bin
+mv restrict_zfs.py ~user/.local/bin/
+chown user: ~user/.local/bin/restrict_zfs.py
+chmod +x ~user/.local/bin/restrict_zfs.py
 ```
 
 Now, allow SSH access by placing the other party's public key in `.ssh/authorized_keys`. However, configure SSH to always run this Python script instead of the user's command:
 
 ```
-restrict,command="python3 restrict_zfs.py" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHpe6qcB6U4kIatI+4CY3AKcvEoapDbKZklbRcr4QR7D
+restrict,command="restrict_zfs.py" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHpe6qcB6U4kIatI+4CY3AKcvEoapDbKZklbRcr4QR7D
 ```
 
 The Python script will verify the original SSH command to make sure it is a command that would be executed by a tool like Syncoid. If the command seems fine, it runs the command as usual without the client noticing. Otherwise, the command is blocked and logged to syslog.
+
+## Running syncoid
+
+Run syncoid with `--no-privilege-elevation` otherwise it will not work, as it will try to add `sudo` to all remote zfs commands. Since zfs delegation gives the non-root user permission to manage its own dataset(s), sudo is unnecessary and should not be configured. Other options can be used as usual with no changes.
+
+Some commands are untested, in particular all "remote source" operations. Remote destination operations are tested and should work, including `--use-hold`, `--insecure-direct-connection` and `--recvoptions`.
+
+Please report any blocked commands and they will be added to the script if necessary!
