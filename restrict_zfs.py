@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 import os
 import re
-import syslog
-import sys
 import subprocess
+import sys
+import syslog
+from argparse import ArgumentParser
+from typing import cast
 
 POOL = r"'[\w-]+'"
 DATASET = r"'[\w\/-]+'"
@@ -64,10 +66,16 @@ def check_allowed(command: str):
     return False
 
 
-if __name__ == '__main__':
-    dryrun = False
-    tostderr = False
-    tosyslog = True
+def main():
+    parser = ArgumentParser()
+    parser.add_argument('--dry-run', action='store_true', help='do not run any commands, log commands regardless of --verbose')
+    parser.add_argument('--verbose', action='store_true', help='log allowed commands, instead of only failed commands')
+    parser.add_argument('--log', help='log destination (zero, one, or multiple may be specified)', choices=("syslog", "stderr"), nargs="*", default=['syslog'])
+    args = parser.parse_args()
+
+    dry_run = cast(bool, args.dry_run)
+    verbose = cast(bool, args.verbose)
+    log = cast(list[str], args.log)
     original_command = os.environ['SSH_ORIGINAL_COMMAND']
 
     # Syncoid can send multiple destroy commands separated by a semicolon when pruning.
@@ -76,22 +84,29 @@ if __name__ == '__main__':
 
     for command in commands:
         command = command.strip()
-        command2 = ['sh', '-c', command]
+        command_to_run = ['sh', '-c', command]
 
         is_allowed = check_allowed(command)
+        run_command = False
+        log_text = None
         if not is_allowed:
-            errtext = 'blocked command: ' + command
-        elif dryrun:
-            errtext = 'would run command (dry run): ' + str(command2)
+            log_text = 'blocked command: ' + command
+        elif dry_run:
+            log_text = 'would run command: ' + str(command_to_run)
         else:
-            errtext = 'running command: ' + str(command2)
+            run_command = True
+            if verbose:
+                log_text = 'running command: ' + str(command_to_run)
 
-        if tostderr:
-            print(errtext, file=sys.stderr)
-        if tosyslog:
-            syslog.syslog(errtext)
+        if log_text:
+            if 'stderr' in log:
+                print(log_text, file=sys.stderr)
+            if 'syslog' in log:
+                syslog.syslog(log_text)
 
-        if not is_allowed:
-            sys.exit(1)
-        elif not dryrun:
-            subprocess.run(command2)
+        if run_command:
+            subprocess.run(command_to_run)
+
+
+if __name__ == '__main__':
+    main()

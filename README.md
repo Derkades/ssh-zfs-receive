@@ -45,3 +45,15 @@ Run syncoid with `--no-privilege-elevation` otherwise it will not work, as it wi
 Some commands are untested, in particular all "remote source" operations. Remote destination operations are tested and should work, including `--use-hold`, `--insecure-direct-connection` and `--recvoptions`.
 
 Please report any blocked commands and they will be added to the script if necessary!
+
+## Command help
+```
+usage: restrict_zfs.py [-h] [--dry-run] [--verbose] [--log [{syslog,stderr} ...]]
+
+options:
+  -h, --help            show this help message and exit
+  --dry-run             do not run any commands, log commands regardless of --verbose
+  --verbose             log allowed commands, instead of only failed commands
+  --log [{syslog,stderr} ...]
+                        log destination (zero, one, or multiple may be specified)
+```
