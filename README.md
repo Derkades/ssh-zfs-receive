@@ -18,6 +18,11 @@ The newly created user can now be given permission to create and modify datasets
 zfs allow <user> create,receive,mount,destroy,rollback,hold,release yourpool/<user>_backup
 ```
 
+Non-root users cannot mount datasets on Linux. You probably don't want backup datasets to be mounted anyway. Unset the mountpoint to avoid any warnings:
+```
+zfs set mountpoint=none yourpool/<user>_backup
+```
+
 ## Command restriction
 
 Download the `restrict_zfs.py` script from this repository and place it in the user's PATH, or alternately in `/usr/local/bin` for it to be available to all users.
