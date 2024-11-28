@@ -57,3 +57,9 @@ options:
   --log [{syslog,stderr} ...]
                         log destination (zero, one, or multiple may be specified)
 ```
+
+## Security warning
+
+This script only performs best-effort parsing of commands using regular expressions. The intention is to make it harder for an attacker to run malicious commands on a backup server. It may not be entirely safe. You are invited to investigate the source code for any potential flaws.
+
+The intention of this script is not to protect your backups. `zfs destroy` and `zfs rollback` are allowed by default, so an attacker could delete all backups. It is only meant to protect other users or other applications on the remote system.
