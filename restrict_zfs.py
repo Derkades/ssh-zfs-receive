@@ -27,6 +27,7 @@ COMPRESS_CMD = r'(?:(?:gzip -3|zcat|pigz -(?:\d+|dc)|zstd -(?:\d+|dc)|xz(?: -d)?
 ZFSPROP = r'[a-z0-9:._-]+=[a-z0-9:._-]*'
 ZFSPROPS = r'(?:-o ' + ZFSPROP + r'\s+)*'
 SHORTOPTS = r'(?:-[A-Za-z0-9]+\s+)*'
+SHORTOPTSVALS = r'(?:-[A-Za-z0-9]+(?:\s+[a-z0-9:._=/-]+)?\s+)*'
 
 # These commands were issued by Syncoid with standard options. If in your
 # usage you notice any commands that should be allowed but aren't allowed
@@ -44,9 +45,9 @@ ALLOWED_COMMANDS = [
     # If syncoid --no-sync-snap is *not* used, the following line may work with SYNCOID_SNAPSHOT
     # instead of DATASET_SNAPSHOT to be more restrictive
     r'zfs rollback -R ' + DATASET_SNAPSHOT,
-    MBUFFER_OR_NC_CMD + PIPE + COMPRESS_CMD + r'\s*zfs receive\s+' + SHORTOPTS + ZFSPROPS + DATASET + REDIRS,
+    MBUFFER_OR_NC_CMD + PIPE + COMPRESS_CMD + r'\s*zfs receive\s+' + SHORTOPTSVALS + DATASET + REDIRS,
     r'zfs receive -A '+ DATASET,
-    r'zfs send\s+' + SHORTOPTS + r'(?:-t [0-9a-f-]+|-[iI] ' + DATASET_SNAPSHOT + r'(?: ' + DATASET_SNAPSHOT + r')?)' + REDIRS + r'(?:' + PIPE + MBUFFER_CMD + r'(?:' + PIPE + SOCAT_CMD + r')?)?',
+    r'zfs send\s+' + SHORTOPTSVALS + r'(?:-t [0-9a-f-]+|-[iI] ' + DATASET_SNAPSHOT + r'(?: ' + DATASET_SNAPSHOT + r')?)' + REDIRS + r'(?:' + PIPE + MBUFFER_CMD + r'(?:' + PIPE + SOCAT_CMD + r')?)?',
     r'zfs snapshot ' + SYNCOID_SNAPSHOT,
     # the script used to only allow destroying SYNCOID_SNAPSHOT but using --no-sync-snap it wanted to destroy "autosnap" snaps
     # loosening the restriction should be safe IF zfs delegation is used with a non-root user (SHOULD be mandatory for security)
