@@ -39,8 +39,8 @@ ALLOWED_COMMANDS = [
     r'zpool get -o value -H feature@extensible_dataset ' + POOL,
     r'ps -Ao args=',
     r'zfs get -H (?:name|receive_resume_token|-p used|syncoid:sync) ' + DATASET + REDIRS,
-    r'zfs get -Hpd 1 (?:-t (?:snapshot|bookmark) |type,)guid,creation ' + DATASET + REDIRS,
-    r'zfs get all -s local -H ' + DATASET,
+    r'zfs get -Hpd 1 (?:-t (?:snapshot|bookmark) |type,)?(?:guid,creation|all) ' + DATASET + REDIRS,
+    r'zfs get (?:all )?-s local -H (?:all )?' + DATASET,
     r'zfs list -o name,origin -t filesystem,volume -Hr ' + DATASET,
     # If syncoid --no-sync-snap is *not* used, the following line may work with SYNCOID_SNAPSHOT
     # instead of DATASET_SNAPSHOT to be more restrictive
