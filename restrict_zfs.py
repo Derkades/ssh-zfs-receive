@@ -27,7 +27,7 @@ COMPRESS_CMD = r'(?:(?:gzip -3|zcat|(?:pigz|zstd|zstdmt) -(?:\d+|dc)|xz(?: -d)?|
 ZFSPROP = r'[a-z0-9:._-]+=[a-z0-9:._-]*'
 ZFSPROPS = r'(?:-o ' + ZFSPROP + r'\s+)*'
 SHORTOPTS = r'(?:-[A-Za-z0-9]+\s+)*'
-SHORTOPTSVALS = r'(?:-[A-Za-z0-9]+(?:\s+[a-z0-9:._=/-]+)?\s+)*'
+SHORTOPTSVALS = r"(?:-[A-Za-z0-9]+(?:\s+'?[A-Za-z0-9:._=/-]+'?)?\s+)*"
 
 # These commands were issued by Syncoid with standard options. If in your
 # usage you notice any commands that should be allowed but aren't allowed
