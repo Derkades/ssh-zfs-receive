@@ -22,7 +22,7 @@ MBUFFER_CMD = r'mbuffer (?:-[rR] \d+[kM])? (?:-W \d+ -I [\w.:-]+ )?-q -s \d+[kM]
 NC_CMD = r'busybox nc -l [\w.:-]+ -w \d+'
 MBUFFER_OR_NC_CMD = r'(?:' + MBUFFER_CMD + r'|' + NC_CMD + r')'
 SOCAT_CMD = r'socat - TCP:[\w.:-]+,retry=\d+,interval=1'
-COMPRESS_CMD = r'(?:(?:gzip -3|zcat|pigz -(?:\d+|dc)|zstd -(?:\d+|dc)|xz(?: -d)?|lzop(?: -dfc)?|lz4(?: -dc)?)\s*\|)?'
+COMPRESS_CMD = r'(?:(?:gzip -3|zcat|(?:pigz|zstd|zstdmt) -(?:\d+|dc)|xz(?: -d)?|lzop(?: -dfc)?|lz4(?: -dc)?)\s*\|)?'
 
 ZFSPROP = r'[a-z0-9:._-]+=[a-z0-9:._-]*'
 ZFSPROPS = r'(?:-o ' + ZFSPROP + r'\s+)*'
