@@ -77,7 +77,16 @@ def main():
     dry_run = cast(bool, args.dry_run)
     verbose = cast(bool, args.verbose)
     log = cast(list[str], args.log)
-    original_command = os.environ['SSH_ORIGINAL_COMMAND']
+
+    try:
+        original_command = os.environ['SSH_ORIGINAL_COMMAND']
+    except:
+        log_text = 'login blocked, only commands allowed'
+        if 'stderr' in log:
+            print(log_text, file=sys.stderr)
+        if 'syslog' in log:
+            syslog.syslog(log_text)
+        sys.exit(1)
 
     # Syncoid can send multiple destroy commands separated by a semicolon when pruning.
     # Split them so that we can validate each command on its own.
@@ -106,7 +115,8 @@ def main():
                 syslog.syslog(log_text)
 
         if run_command:
-            subprocess.run(command_to_run)
+            result = subprocess.run(command_to_run)
+            sys.exit(result.returncode)
 
 
 if __name__ == '__main__':
