@@ -54,6 +54,7 @@ ALLOWED_COMMANDS = [
     r'zfs destroy ' + DATASET_SNAPSHOT,
     r'zfs hold ' + SYNCOID_HOLD + r'\s+' + DATASET_SNAPSHOT,
     r'zfs release ' + SYNCOID_HOLD + r'\s+' + DATASET_SNAPSHOT,
+    r'zfs create (?:-p )?' + DATASET,
 ]
 
 COMPILED = [re.compile(command) for command in ALLOWED_COMMANDS]
