@@ -14,7 +14,8 @@ DATASET_SNAPSHOT = r"'[\w/-]+'@('?)[\w.:-]+\1"
 # Note: Syncoid does NOT single quote the snapshot name as of version 2.1.0, but let's allow that.
 SYNCOID_SNAPSHOT = r"'[\w/-]+'@('?)syncoid_[\w.:-]+\1"
 
-SYNCOID_HOLD = r"[\w]+"
+# TODO: find all characters that are allowed in a hold tag
+SYNCOID_HOLD = r"[\w.:-]+"
 
 REDIRS = r'(?:\s+(?:2>/dev/null|2>&1))?'
 PIPE = r'\s*\|\s*'
