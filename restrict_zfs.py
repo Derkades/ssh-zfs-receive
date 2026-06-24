@@ -38,10 +38,12 @@ ALLOWED_COMMANDS = [
     r'command -v (?:gzip|zcat|pigz|zstd|xz|lzop|lz4|mbuffer|socat|busybox)',
     r'zpool get -o value -H feature@extensible_dataset ' + POOL,
     r'ps -Ao args=',
-    r'zfs get -H (?:name|receive_resume_token|-p used|syncoid:sync) ' + DATASET + REDIRS,
-    r'zfs get -Hpd 1 (?:-t (?:snapshot|bookmark) |type,)?(?:guid,creation|all) ' + DATASET + REDIRS,
+    r'zfs get -H (?:-t snapshot|createtxg)',
+    r'zfs get -H (?:name|receive_resume_token|-p used|syncoid:sync|type|recordsize) ' + DATASET + REDIRS,
+    r'zfs get -Hpd 1 (?:-t (?:snapshot|bookmark) |type,)?(?:guid,creation(?:,createtxg)|all) ' + DATASET + REDIRS,
     r'zfs get (?:all )?-s local -H (?:all )?' + DATASET,
     r'zfs list -o name,origin -t filesystem,volume -Hr ' + DATASET,
+    r'zfs set ' + ZFSPROPS + DATASET,
     # If syncoid --no-sync-snap is *not* used, the following line may work with SYNCOID_SNAPSHOT
     # instead of DATASET_SNAPSHOT to be more restrictive
     r'zfs rollback -R ' + DATASET_SNAPSHOT,
@@ -51,10 +53,12 @@ ALLOWED_COMMANDS = [
     r'zfs snapshot ' + SYNCOID_SNAPSHOT,
     # the script used to only allow destroying SYNCOID_SNAPSHOT but using --no-sync-snap it wanted to destroy "autosnap" snaps
     # loosening the restriction should be safe IF zfs delegation is used with a non-root user (SHOULD be mandatory for security)
+    # TODO: syncoid --force-delete will do destroy -r
     r'zfs destroy ' + DATASET_SNAPSHOT,
     r'zfs hold ' + SYNCOID_HOLD + r'\s+' + DATASET_SNAPSHOT,
     r'zfs release ' + SYNCOID_HOLD + r'\s+' + DATASET_SNAPSHOT,
     r'zfs create (?:-p )?[\w\/-]+',
+    # TODO: bookmark
 ]
 
 COMPILED = [re.compile(command) for command in ALLOWED_COMMANDS]
